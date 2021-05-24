@@ -11,6 +11,7 @@ const Bacon = require('baconjs');
 
 const Kafka = require('no-kafka');
 const consumerTopicBase = process.env.KAFKA_CONSUMER_TOPIC;
+const kafkaPrefix = process.env.KAFKA_PREFIX;
 
 // const configTopic = process.env.KAFKA_CONFIG_TOPIC;
 
@@ -91,10 +92,10 @@ return producer.init().then(function() {
                     sink(JSONbig.parse(m.message.value.toString('utf8')));
                 });
             }
-            consumer.subscribe(consumerTopic, dataHandler);
+            consumer.subscribe(kafkaPrefix+consumerTopic, dataHandler);
 
             return function() {
-                consumer.unsubscribe(consumerTopic);
+                consumer.unsubscribe(kafkaPrefix+consumerTopic);
             }
         });
 
@@ -140,7 +141,7 @@ return producer.init().then(function() {
             }
 
             producer.send({
-                topic: `${consumerTopicBase}-aggregate`,
+                topic: kafkaPrefix + `${consumerTopicBase}-aggregate`,
                 partition: 0,
                 message: {
                     value: JSONbig.stringify(msg)
